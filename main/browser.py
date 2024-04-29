@@ -183,9 +183,43 @@ class BrowserOpen:
 
 
 
+                    # review_container_xpath = "//div[@class='text show-more__control']"
+                    # review_descriptions = []  # Initialize a list to store review descriptions
+                    # try:
+                    #     review_container_elements = sel.find_elements(review_container_xpath)
+                    #     num_containers = len(review_container_elements)
+                    #     print(f"Number of review containers found: {num_containers}")
+                    #     num_to_print = min(5, num_containers)
+                    #     for i in range(num_to_print):
+                    #         description_text = sel.get_text(review_container_elements[i])
+                    #         review_descriptions.append(description_text)  # Append description to the list
+                    # except:
+                    #         print("No review containers found.")
+                            
+                    # for i, description_text in enumerate(review_descriptions, start=1):
+                    #     print(f"Review Description {i}: {description_text}")
+                    #     print()  # Print an empty line between each review description
+
+                    # review_container_xpath = "//div[@class='text show-more__control']"
+                    # try:
+                    #     review_container_elements = sel.find_elements(review_container_xpath)
+                    #     num_containers = len(review_container_elements)
+                    #     print(f"Number of review containers found: {num_containers}")
+                    #     num_to_print = min(5, num_containers)
+                    #     review_descriptions = []  # Initialize a list to store review descriptions
+                    #     for i in range(num_to_print):
+                    #         description_text = sel.get_text(review_container_elements[i])
+                    #         review_descriptions.append(description_text)  # Append description to the list
+                    #         review_descriptions += ["No reviews"] * (5 - num_to_print)
+                    # except:
+                    #     print("No review containers found.")
+                    #     review_descriptions = ["No reviews"] * 5
+
+                
 
 
                     review_container_xpath = "//div[@class='text show-more__control']"
+                    review_descriptions = []
                     try:
                         review_container_elements = sel.find_elements(review_container_xpath)
                         num_containers = len(review_container_elements)
@@ -193,10 +227,12 @@ class BrowserOpen:
                         num_to_print = min(5, num_containers)
                         for i in range(num_to_print):
                             description_text = sel.get_text(review_container_elements[i])
-                            print(f"Review Description {i + 1}: {description_text}")
+                            review_descriptions.append(f"Review Description {i + 1}: {description_text}")
+                            # print(f"Review Description {i + 1}: {description_text}")
+                        print(review_descriptions)
 
                     except:
-                        description_text = None
+                        review_descriptions = None
                         print("No review containers found.")
                 except:
                     review='N/A'
@@ -221,7 +257,7 @@ class BrowserOpen:
                            Genre= genres,
                            Review_rating = ratings_list,
                            Review_titles = review_titles,
-                           Review_description = description_text,
+                           Review_descriptions = review_descriptions,
                            status="Success")
         else:
             print(f"No movies found with the name",Movie_name)
@@ -232,7 +268,7 @@ class BrowserOpen:
                            Genre= None,
                            Review_rating = None,
                            Review_titles = None,
-                           Review_description = None,
+                           Review_descriptions = None,
                            status="No element found")
 
             
