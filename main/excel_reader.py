@@ -4,8 +4,7 @@ from main.constants import excel_file
 class Excel:
     def __init__(self) -> None:
         pass
-
-    @staticmethod
+    
     def read_excel():
         lib = Files()
         lib.open_workbook(excel_file)
