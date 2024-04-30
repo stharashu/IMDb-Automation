@@ -19,9 +19,11 @@ class Database:
                 Popularity REAL,
                 Storyline TEXT,
                 Genre TEXT,
-                Review_rating REAL,
-                Review_titles TEXT,
-                Review_descriptions TEXT,
+                Review_1 TEXT,
+                Review_2 TEXT,
+                Review_3 TEXT,
+                Review_4 TEXT,
+                Review_5 TEXT,
                 status TEXT
                 )'''
             self.cursor.execute(create_table_sql)
@@ -29,17 +31,13 @@ class Database:
         except sqlite3.Error as e:
             print("Error creating table:", e)
 
-    def insert_data(self, Movie, Imdb_rating, Popularity, Storyline, Genre, Review_rating, Review_titles, Review_descriptions, status):
+    def insert_data(self, Movie, Imdb_rating, Popularity, Storyline, Genre, Review_1,Review_2, Review_3, Review_4, Review_5, status):
         try:
-            Genre_str = json.dumps(Genre)
-            Review_rating_str = json.dumps(Review_rating)
-            Review_titles_str = json.dumps(Review_titles)
-            Review_descriptions_str = json.dumps(Review_descriptions)
             
             # Review_description_1, Review_description_2, Review_description_3, Review_description_4, Review_description_5 = Review_descriptions
 
-            insert_sql = f'''INSERT INTO {self.table_name} (Movie, Imdb_rating, Popularity, Storyline, Genre, Review_rating, Review_titles, Review_descriptions, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'''
-            values = (Movie, Imdb_rating, Popularity, Storyline, Genre_str, Review_rating_str, Review_titles_str, Review_descriptions_str, status)
+            insert_sql = f'''INSERT INTO {self.table_name} (Movie, Imdb_rating, Popularity, Storyline, Genre, Review_1,Review_2, Review_3, Review_4, Review_5, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+            values = (Movie, Imdb_rating, Popularity, Storyline, Genre, Review_1,Review_2, Review_3, Review_4, Review_5, status)
             
             self.cursor.execute(insert_sql, values)
             self.conn.commit()

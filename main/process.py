@@ -14,6 +14,7 @@ class Process:
     
     
     def run_process():
+        Excel.read_excel()
         BrowserOpen.search_bar()
     
     def after_run_process():

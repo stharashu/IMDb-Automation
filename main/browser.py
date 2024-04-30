@@ -24,6 +24,21 @@ class BrowserOpen:
         db.create_table()
                            
         for row in excel_data:
+            ratings_list = []
+            review_titles = []
+            review_descriptions = []
+            review_data = None
+            review_data_1 = None
+            review_data_2 = None
+            review_data_3 = None
+            review_data_4 = None
+            review_data_5 = None
+            Movie_name = None
+            genres_string = None
+            data_found= True
+            
+
+
             sel.input_text(search_path,row['Movie'])
             sel.press_keys(None,'\ue007' )  #\ue007
             # sel.click_element("//button[@id='suggestion-search-button']")
@@ -31,30 +46,35 @@ class BrowserOpen:
             Movie_name = row['Movie']
             try:
                 sel.click_element(exact_results)
+                data_found = True
+
             except Exception as e:
                 print(f"Exception: {e}")
                 # print(f"No locator found for exact results for movie: {row['Movie']}")
                 # TV Movie locator instead
                 sel.click_element(tv_movie_path)
                 sel.click_element(exact_results)
+                data_found = True
 
+            except:
+                data_found = False
+                print("Not found movie", Movie_name)
+                
+
+            
             li_count = sel.get_element_count(movie_list)
-            # print(f"Number of li elements inside the unordered list: {li_count}")
-
             latest_release_date = None
             latest_movie_element = None
-
             
             for i in range(1, li_count + 1):
                 date_xpath = f'//*[@id="__next"]/main/div[2]/div[3]/section/div/div[1]/section[2]/div[2]/ul/li[{i}]/div[2]/div/ul[1]'
                 date_element = sel.find_element(date_xpath)
                 release_date = date_element.text.strip()  # Extract the release date text
-                # Find the release date and compare it with the latest release date found so far
                 if release_date:
                     if latest_release_date is None or release_date > latest_release_date:
                         latest_release_date = release_date
                         latest_movie_element = date_element
-                
+                    
             if latest_movie_element:
                 latest_movie_element.click()
                 # print(f"Clicked on the movie with the latest release date: {latest_release_date}")
@@ -65,7 +85,7 @@ class BrowserOpen:
                 sel.scroll_element_into_view("//span[normalize-space()='Storyline']")
                 sel.wait_until_page_contains_element("//a[normalize-space()='Plot summary']",timeout=100)
 
-            #for rating
+                #for rating
                 rating_xpath = '//*[@id="__next"]/main/div/section[1]/section/div[3]/section/section/div[2]/div[2]/div/div[1]/a/span/div/div[2]/div[1]/span[1]'
                 try:
                     rating_element = sel.find_element(rating_xpath)
@@ -83,7 +103,7 @@ class BrowserOpen:
                     popularity = 'N/A'
                 print("The popularity score is", popularity)
 
-            
+                
                 # storyline=None
                 storyline_xpath = "//div[@data-testid='storyline-plot-summary']"
                 try:
@@ -91,24 +111,15 @@ class BrowserOpen:
                 except:
                     storyline='N/A'
                 print("Storyline:",storyline)
-                
+                    
                 #genre
-                genre_xpath = "//li[@data-testid='storyline-genres']//ul[@role='presentation']"
+                genre_xpath = "//li[@data-testid='storyline-genres']//ul[@role='presentation']//li"
                 sel.scroll_element_into_view(genre_xpath)
                 sel.wait_until_element_is_visible(genre_xpath)
                 genre_elements = sel.find_elements(genre_xpath)
-                genres = [genre.strip() for genre_element in genre_elements for genre in sel.get_text(genre_element).split(",")]
-                print("Genres:", genres)
-
-                # genre_xpath = "//li[@data-testid='storyline-genres']//ul[@role='presentation']"
-                # sel.scroll_element_into_view(genre_xpath)
-                # sel.wait_until_element_is_visible(genre_xpath)
-                # genre_elements = sel.find_elements(genre_xpath)
-                # genre_texts = []
-                # for genre_element in genre_elements:
-                #     genre_texts.append(sel.get_text(genre_element))
-                # genres = ", ".join(genre_texts)
-                # print("Genres:", genres)
+                genres = [sel.get_text(genre_element).strip() for genre_element in genre_elements]
+                genres_string = ", ".join(genres)
+                print("Genres:", genres_string)
 
 
                 #review
@@ -116,7 +127,7 @@ class BrowserOpen:
                 try:
                     sel.scroll_element_into_view(review_xpath)
                     sel.click_element(review_xpath)
-
+                        
                     dropdown_xpath = "//select[@name='sort']"
                     sel.scroll_element_into_view(dropdown_xpath)
                     sel.wait_until_element_is_visible(dropdown_xpath)
@@ -127,33 +138,18 @@ class BrowserOpen:
                     dropdown.select_by_visible_text(last_option)
 
                     sel.wait_until_element_is_visible('//a[@class="title"]')
-                    #title of the review
-                    # title_elements = sel.find_elements('//a[@class="title"]')[:5]
-                    # for i, element in enumerate(title_elements, start=1):
-                    #     text_content = sel.get_text(element)
-                    #     print(f"Review {i}: {text_content}")
 
                     title_elements = sel.find_elements('//a[@class="title"]')[:5]
                     review_titles = []
                     for i, element in enumerate(title_elements, start=1):
                         text_content = sel.get_text(element)
-                        review_titles.append(f"Review {i}: {text_content}")
-                    print(review_titles)
-
-
-
-                    #review rating
-                    # rating_elements = sel.find_elements('//span[@class="rating-other-user-rating"]')[:5]
-                    # for i, rating_element in enumerate(rating_elements, start=1):
-                    #     rating_review = sel.get_text(rating_element)
-                    #     print(f"Rating {i}: {rating_review}")
+                        review_titles.append(f"Title {i}: {text_content}")
 
                     rating_elements = sel.find_elements('//span[@class="rating-other-user-rating"]')[:5]
                     ratings_list = []
                     for i, rating_element in enumerate(rating_elements, start=1):
                         rating_review = sel.get_text(rating_element)
                         ratings_list.append(f"Rating {i}: {rating_review}")
-                    print(ratings_list)
 
                     #expand all
                     expander_xpath = '//*[@class="expander-icon-wrapper spoiler-warning__control"]'
@@ -163,60 +159,6 @@ class BrowserOpen:
                             sel.click_element(expander_element)
                     except: 
                         pass
-
-                    #description
-                    # #description
-                    # review_container_xpath = "//div[@class='text show-more__control']"
-                    # try:
-                    #     review_container_elements = sel.find_elements(review_container_xpath)
-                    #     num_containers = len(review_container_elements)
-                    #     print(f"Number of review containers found: {num_containers}")
-                    #     review_descriptions = []  # Initialize a list to store review descriptions
-                    #     num_to_print = min(5, num_containers)
-                    #     for i in range(num_to_print):
-                    #         description_text = sel.get_text(review_container_elements[i])
-                    #         review_descriptions.append(description_text)  # Append description to the list
-                    # except:
-                    #     review_descriptions = []  # Handle the case when no review containers are found
-                    #     print("No review containers found.")
-                    # print("Review Descriptions:", review_descriptions)  # Print the list of review descriptions
-
-
-
-                    # review_container_xpath = "//div[@class='text show-more__control']"
-                    # review_descriptions = []  # Initialize a list to store review descriptions
-                    # try:
-                    #     review_container_elements = sel.find_elements(review_container_xpath)
-                    #     num_containers = len(review_container_elements)
-                    #     print(f"Number of review containers found: {num_containers}")
-                    #     num_to_print = min(5, num_containers)
-                    #     for i in range(num_to_print):
-                    #         description_text = sel.get_text(review_container_elements[i])
-                    #         review_descriptions.append(description_text)  # Append description to the list
-                    # except:
-                    #         print("No review containers found.")
-                            
-                    # for i, description_text in enumerate(review_descriptions, start=1):
-                    #     print(f"Review Description {i}: {description_text}")
-                    #     print()  # Print an empty line between each review description
-
-                    # review_container_xpath = "//div[@class='text show-more__control']"
-                    # try:
-                    #     review_container_elements = sel.find_elements(review_container_xpath)
-                    #     num_containers = len(review_container_elements)
-                    #     print(f"Number of review containers found: {num_containers}")
-                    #     num_to_print = min(5, num_containers)
-                    #     review_descriptions = []  # Initialize a list to store review descriptions
-                    #     for i in range(num_to_print):
-                    #         description_text = sel.get_text(review_container_elements[i])
-                    #         review_descriptions.append(description_text)  # Append description to the list
-                    #         review_descriptions += ["No reviews"] * (5 - num_to_print)
-                    # except:
-                    #     print("No review containers found.")
-                    #     review_descriptions = ["No reviews"] * 5
-
-                
-
 
                     review_container_xpath = "//div[@class='text show-more__control']"
                     review_descriptions = []
@@ -228,48 +170,143 @@ class BrowserOpen:
                         for i in range(num_to_print):
                             description_text = sel.get_text(review_container_elements[i])
                             review_descriptions.append(f"Review Description {i + 1}: {description_text}")
-                            # print(f"Review Description {i + 1}: {description_text}")
-                        print(review_descriptions)
-
                     except:
-                        review_descriptions = None
+                        review_descriptions = ["N/A"] * 5
                         print("No review containers found.")
+
+                    # Print reviews as strings
+                    if len(review_titles) == 0:  # If no reviews found, insert placeholders
+                        review_titles = ["N/A"] * 5
+                        ratings_list = ["N/A"] * 5
+                        review_descriptions = ["N/A"] * 5
+
+                    for i in range(5):
+                        review_data = f"Review {i+1}: {review_titles[i]} | {ratings_list[i]} | {review_descriptions[i]}"
+                        print(review_data)
+
+                    review_data_1 = f"{review_titles[0]} | {ratings_list[0]} | {review_descriptions[0]}"
+                    review_data_2 = f"{review_titles[1]} | {ratings_list[1]} | {review_descriptions[1]}"
+                    review_data_3 = f"{review_titles[2]} | {ratings_list[2]} | {review_descriptions[2]}"
+                    review_data_4 = f"{review_titles[3]} | {ratings_list[3]} | {review_descriptions[3]}"
+                    review_data_5 = f"{review_titles[4]} | {ratings_list[4]} | {review_descriptions[4]}"
+
+
+                    # for i in range(5):
+                    #     review_data = f"Review {i+1}: {review_titles[i]} | {ratings_list[i]} | {review_descriptions[i]}"
+                    #     print(review_data)
+                        
+                    # review_data_1 = f"{review_titles[0]} | {ratings_list[0]} | {review_descriptions[0]}" if review_titles else None
+                    # review_data_2 = f"{review_titles[1]} | {ratings_list[1]} | {review_descriptions[1]}" if len(review_titles) > 1 else None
+                    # review_data_3 = f"{review_titles[2]} | {ratings_list[2]} | {review_descriptions[2]}" if len(review_titles) > 2 else None
+                    # review_data_4 = f"{review_titles[3]} | {ratings_list[3]} | {review_descriptions[3]}" if len(review_titles) > 3 else None
+                    # review_data_5 = f"{review_titles[4]} | {ratings_list[4]} | {review_descriptions[4]}" if len(review_titles) > 4 else None
+
+
                 except:
-                    review='N/A'
                     print("No reviews.")
+
+                    
+
+
+                    # review_xpath = "//a[normalize-space()='User reviews']"
+                    # try:
+                    #     sel.scroll_element_into_view(review_xpath)
+                    #     sel.click_element(review_xpath)
+
+                    #     dropdown_xpath = "//select[@name='sort']"
+                    #     sel.scroll_element_into_view(dropdown_xpath)
+                    #     sel.wait_until_element_is_visible(dropdown_xpath)
+                    #     dropdown_element = sel.find_element(dropdown_xpath)
+                    #     dropdown = Select(dropdown_element)
+                    #     options = dropdown.options
+                    #     last_option = options[-1].text
+                    #     dropdown.select_by_visible_text(last_option)
+
+                    #     sel.wait_until_element_is_visible('//a[@class="title"]')
+
+                    #     title_elements = sel.find_elements('//a[@class="title"]')[:5]
+                    #     review_titles = []
+                    #     for i, element in enumerate(title_elements, start=1):
+                    #         text_content = sel.get_text(element)
+                    #         review_titles.append(f"Review {i}: {text_content}")
+                    #     print(review_titles)
+
+                    #     rating_elements = sel.find_elements('//span[@class="rating-other-user-rating"]')[:5]
+                    #     ratings_list = []
+                    #     for i, rating_element in enumerate(rating_elements, start=1):
+                    #         rating_review = sel.get_text(rating_element)
+                    #         ratings_list.append(f"Rating {i}: {rating_review}")
+                    #     print(ratings_list)
+
+                    #     #expand all
+                    #     expander_xpath = '//*[@class="expander-icon-wrapper spoiler-warning__control"]'
+                    #     try:
+                    #         expander_elements = sel.find_elements(expander_xpath)
+                    #         for expander_element in expander_elements:
+                    #             sel.click_element(expander_element)
+                    #     except: 
+                    #         pass
+
+        
+                    #     review_container_xpath = "//div[@class='text show-more__control']"
+                    #     review_descriptions = []
+                    #     try:
+                    #         review_container_elements = sel.find_elements(review_container_xpath)
+                    #         num_containers = len(review_container_elements)
+                    #         print(f"Number of review containers found: {num_containers}")
+                    #         num_to_print = min(5, num_containers)
+                    #         for i in range(num_to_print):
+                    #             description_text = sel.get_text(review_container_elements[i])
+                    #             review_descriptions.append(f"Review Description {i + 1}: {description_text}")
+                    #             # print(f"Review Description {i + 1}: {description_text}")
+                    #         print(review_descriptions)
+
+                    #     except:
+                    #         review_descriptions = None
+                    #         print("No review containers found.")
+                    # except:
+                    #     review='N/A'
+                    #     print("No reviews.")
             else:
                 print("No movies found.")
+            
 
             
-            # print(type(Movie_name))
-            # print(type(rating))
-            # print(type(popularity))
-            # print(type(storyline))
-            # print(type(genres))
-            # print(type(ratings_list))
-            # print(type(review_titles))
-            # print(type(description_text))
 
-            db.insert_data(Movie=Movie_name,
+            # if Movie_name is None or all(v is None or (isinstance(v, list) and len(v) == 0) for v in (rating, popularity, storyline, genres, ratings_list, review_titles, review_descriptions)):
+            #     Status = "No element found"
+            # else:
+            #     Status = "Success"
+
+
+        
+            if data_found is True:
+                db.insert_data(Movie=Movie_name,
                            Imdb_rating=rating,
                            Popularity= popularity,
                            Storyline = storyline,
-                           Genre= genres,
-                           Review_rating = ratings_list,
-                           Review_titles = review_titles,
-                           Review_descriptions = review_descriptions,
-                           status="Success")
-        else:
-            print(f"No movies found with the name",Movie_name)
-            db.insert_data(Movie=None,
-                           Imdb_rating=None,
-                           Popularity= None,
-                           Storyline = None,
-                           Genre= None,
-                           Review_rating = None,
-                           Review_titles = None,
-                           Review_descriptions = None,
-                           status="No element found")
+                           Genre= genres_string,
+                           Review_1 = review_data_1,
+                           Review_2 = review_data_2,
+                           Review_3 = review_data_3,
+                           Review_4 = review_data_4,
+                           Review_5 = review_data_5,
+                           status= "Success")
+
+            if data_found is False:
+                print("No data found for", Movie_name)
+                db.insert_data(Movie=Movie_name,
+                   Imdb_rating='N/A',
+                   Popularity='N/A',
+                   Storyline='N/A',
+                   Genre='N/A',
+                   Review_1='N/A',
+                   Review_2='N/A',
+                   Review_3='N/A',
+                   Review_4='N/A',
+                   Review_5='N/A',
+                   status="No element found")
+
 
             
     def close_browser():
