@@ -5,10 +5,10 @@ class Excel:
     def __init__(self) -> None:
         pass
     
-    def read_excel():
-        lib = Files()
-        lib.open_workbook(excel_file)
-        data = lib.read_worksheet_as_table(header=True)
+    def read_excel(self):
+        self.lib = Files()
+        self.lib.open_workbook(excel_file)
+        data = self.lib.read_worksheet_as_table(header=True)
         # for row in data:
             # print(data)
         return data

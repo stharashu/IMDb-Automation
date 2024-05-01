@@ -5,20 +5,20 @@ from main.connect_database import Database
 
 class Process:
     def __init__(self) -> None:
-        pass
+        self.browser = None
+
         
     
-    def before_run_process():
-        BrowserOpen().open_browser()
-        Database().create_table()
+    def before_run_process(self):
+        self.browser = BrowserOpen()
+        self.browser.open_browser()
+        database = Database()
+        database.create_table()
     
+    def run_process(self):
+        self.excel_file = Excel()
+        self.excel_file.read_excel()
+        self.browser.search_bar()
     
-    def run_process():
-        Excel.read_excel()
-        BrowserOpen.search_bar()
-    
-    def after_run_process():
-        BrowserOpen.close_browser()
-        
-        
-        
+    def after_run_process(self):
+        self.browser.close_browser()

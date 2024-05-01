@@ -1,8 +1,6 @@
 from RPA.Browser.Selenium import Selenium
 from main.excel_reader import Excel
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-# from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from main.constants import *
 from main.connect_database import Database
 
@@ -12,18 +10,18 @@ class BrowserOpen:
     def __init__(self) -> None:
         pass
 
-    @staticmethod
-    def open_browser():
+
+    def open_browser(self):
         sel.open_available_browser(url)
         sel.maximize_browser_window()
     
 
-    @staticmethod
-    def search_bar():
-        excel_data = Excel.read_excel()
+    def search_bar(self):
+        self.excel_data = Excel()
+        excel_file = self.excel_data.read_excel()
         db.create_table()
                            
-        for row in excel_data:
+        for row in excel_file:
             ratings_list = []
             review_titles = []
             review_descriptions = []
@@ -230,7 +228,7 @@ class BrowserOpen:
 
 
             
-    def close_browser():
+    def close_browser(self):
         sel.close_browser()
         pass
       
