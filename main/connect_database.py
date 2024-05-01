@@ -38,33 +38,9 @@ class Database:
 
             insert_sql = f'''INSERT INTO {self.table_name} (Movie, Imdb_rating, Popularity, Storyline, Genre, Review_1,Review_2, Review_3, Review_4, Review_5, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
             values = (Movie, Imdb_rating, Popularity, Storyline, Genre, Review_1,Review_2, Review_3, Review_4, Review_5, status)
-            
+            values = ["N/A" if v is None else v for v in values]
             self.cursor.execute(insert_sql, values)
             self.conn.commit()
 
         except sqlite3.Error as e:
             print("Error inserting into database:", e)
-
-
-    # def insert_data(self, Movie, Imdb_rating , Popularity, Storyline, Genre, Review_rating, Review_titles, Review_description, status):
-    #     try:
-    #         # Convert lists to JSON strings
-    #         Genre_str = json.dumps(Genre)
-    #         Review_rating_str = json.dumps(Review_rating)
-    #         Review_titles_str = json.dumps(Review_titles)
-    #         Review_description_str = json.dumps(Review_description)
-
-    #         insert_sql = f'''INSERT INTO {self.table_name} (Movie, Imdb_rating, Popularity, Storyline, Genre, Review_rating, Review_titles, Review_description, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'''
-    #         values = (Movie, Imdb_rating, Popularity, Storyline, Genre_str, Review_rating_str, Review_titles_str, Review_description_str, status)
-    #         self.cursor.execute(insert_sql, values)
-    #         self.conn.commit()
-    #     except sqlite3.Error as e:
-    #         print("Error inserting into database:", e)
-
-
-        #     insert_sql = f'''INSERT INTO {self.table_name} (Movie, Imdb_rating, Popularity, Storyline, Genre, Review_rating, Review_titles, Review_description, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'''
-        #     values = (Movie, Imdb_rating , Popularity, Storyline, Genre, Review_rating, Review_titles, Review_description, status)
-        #     self.cursor.execute(insert_sql, values)
-        #     self.conn.commit()
-        # except sqlite3.Error as e:
-        #     print("Error inserting into database:", e)
